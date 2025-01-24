@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jan 24 15:31:17 2025
+
+@author: Marian
+"""
+ 
+# ------------------- Extract TFP measure ------------------- 
+
+# Take a stand on the production function and extract a
+# measure for TFP. You can do this using (i) real GDP (rgdpna), (ii) the number of
+# employed workers (emp), and (iii) the capital stock at constant 2017 national prices
+# (rnna). But you may also consider using the human capital index (hc). The
+# benchmark value for alpha should be 0.3 but check whether your results are robust
+# to alternative values.
+
+
+
+# Step 1: Calulate TFP
+
+# Y = (K**alpha)*(AL)**(1-alpha) Eq. 1
+# Y: GDP
+# A: TFP
+# L: Labour
+# K: Capital
+# Alpha = 0.3
+
+# From equation 1 we get
+# A = ((Y/(K**alpha))**(1/(1-alpha)))/L Eq. 2
+
+import numpy as np 
+import pandas as pd 
+
+# ---------------------- Set Parameters ---------------------- 
+
+alpha = 0.3
+
+
+
+# ------------------------- Load Data ------------------------- 
+
+def load_data(filepath): 
+    # Read Excel file into a pandas DataFrame
+    dataContent = pd.read_excel(filepath, header = 0)
+    
+    # Convert the DataFrame to a NumPy array
+    data_india = dataContent.to_numpy(dtype=np.float64)
+
+    return data_india
+  
+
+# ------------------------- Set Format ------------------------- 
+    
+data_india = load_data("India_data.xlsx")
+
+df_india = pd.DataFrame(data_india, columns=["Year", "Real GDP (Y)", "Capital 2017 (K)", "Employed Workers (L)", "Human Capital (HC)"])
+    # This convert data_india (originaly a NumPy) into a pandas DataFrame (it works like a table and is ideal to manipulate data)
+    # columns=[...]: names the columns and puts labels on them
+
+df_india = df_india.astype({"Year": "int32"})
+    # This makes the data from the column "Year" into a int32, which is better for integers
+df_india = df_india.set_index("Year")
+    # Here we are setting "Year" as the index. This mean that each row will be identified by the year, making it easy to reference or look up data based on the year
+    
+print("\n\t ========================== Inspecting Data ==========================\n")
+print(df_india)
+print("\n")
+
+
+# ----------------------- Do the Maths -----------------------   
+
+# Extract data as numpy arrays
+year = df_india.index.to_numpy() 
+Y = df_india["Real GDP (Y)"].to_numpy()
+K = df_india["Capital 2017 (K)"].to_numpy()
+L = df_india["Employed Workers (L)"].to_numpy()
+HC = df_india["Human Capital (HC)"].to_numpy()
+# We want to use NumPy, as unlike Pandas, it allows for operations on whole arrays at once
+
+A = ((Y/(K**alpha))**(1/(1 - alpha)))/L
+
+# Add TFP (A) series to our pandas dataframe and inspect the data
+df_india["TFP (A)"] = A
+print("\n\t ====================== Inspecting Data with TFP ======================\n")
+print(df_india)
+print("\n")
+
+
+# ----------------------- Modify to include HC -----------------------   
+# L_hc = L*HC Eq. 3
+# From equation 2 and 3 we get
+# A = ((Y/(K**alpha))**(1/(1-alpha)))/(L*HC) Eq. 4
+
+A_hc = ((Y/(K**alpha))**(1/(1 - alpha)))/(L*HC)
+
+# Add TFP_hc (A_hc) series to our pandas dataframe and inspect the data
+df_india["TFP_hc (A_hc)"] = A_hc
+print("\n\t ====================== Inspecting Data with TFP_hc ======================\n")
+print(df_india)
+print("\n")
+
+
