@@ -1,2 +1,2 @@
 # EC2B1_India
-GDP growth analysis
+India's GDP growth analysis
