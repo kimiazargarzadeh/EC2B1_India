@@ -1,0 +1,50 @@
+import numpy as np
+import pandas as pd
+from get_regression_coefs_general import get_regression_coefs
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set_theme('talk', style = 'white')
+data = pd.read_excel('C:/Users/Harley/OneDrive/LSE/MACRO/pwt100.xlsx', sheet_name = 'Data', header = 0)
+data = data.loc[:, ("country", "year", "rgdpe", "pop")]
+data["rgdpe_pc"] = data["rgdpe"] / data["pop"]
+data = data.loc[data["country"] == "India", ("year", "rgdpe_pc")] 
+data = data.reset_index(drop = True) 
+ymax = 2006
+ymin = 1950
+Y = data.loc[np.logical_and(data["year"] <= ymax, data["year"] >= ymin), "rgdpe_pc"]#选出来的sample
+y = np.log(Y)
+data = data[data["year"] >= ymin]
+T = len(Y)
+T_all = data["year"].max() - (ymin - 1)#max:population
+# Additive Linear Model
+x1 = np.empty(T)#一个空的vector
+x2 = np.empty(T)
+for t in range(T):
+   x1[t] = 1
+   x2[t] = t + 1#年份从1开始排序
+intercept, coef = get_regression_coefs(Y, x1, x2)
+Yhat = np.empty(T_all)#
+for t in range(T_all):
+    Yhat[t] = intercept + coef * (t + 1)
+#Additive quadratic Model
+for t in range(T):
+    x3=(t+1)**2
+intercept_qua, coef_lin, coef_qua=get_regression_coefs(Y,x1,x2,x3)
+Yhat_qua=np.empty(T_all)
+for t in range(T_all):
+    Yhat_qua[t]=intercept_qua + coef_lin*(t+1) + coef_qua*(t+1)**2
+#exponential + linear Model
+intercept_exp, coef_exp = get_regression_coefs(y,x1,x2)
+Yhat_exp = np.empty(T_all)
+for t in range(T_all):
+    Yhat_exp[t] = intercept + coef_exp * (t + 1) 
+Lw=4
+plt.figure()
+plt.figure(figsize=(7, 5))
+plt.plot(data['year'],np.log(data['rgdpe_pc']))
+plt.plot(data['year'],Yhat)
+plt.plot(data['year'],Yhat_qua)
+plt.plot(data['year'],Yhat_exp)
+plt.xlabel("year")
+plt.ylabel("ln(GDP)")
+plt.t
