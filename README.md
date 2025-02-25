@@ -24,9 +24,8 @@ These findings highlight the interplay of growth models and institutions in shap
 - **SQL**: Used to query and extract data from financial databases (if applicable).
 - **Excel/CSV**: Data sources used for analysis.
 
-## **Getting Started**
 
-### **1. Prerequisites**
+### **Prerequisites**
 To run the notebook, you will need the following:
 
 - **Python 3.x** (preferably version 3.7 or later)
