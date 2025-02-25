@@ -1,4 +1,3 @@
-# EC2B1_India
 # **India’s GDP Growth Analysis: A Data-Driven Approach**
 
 ## **Overview**
